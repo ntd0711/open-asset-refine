@@ -1,42 +1,39 @@
-import type { DataProvider } from "@refinedev/core";
+import { axiosInstance } from "@api/axiosInstance";
+import { HttpClient } from "@api/httpClient";
+import type { BaseKey, BaseRecord, DataProvider } from "@refinedev/core";
 
 const API_URL = "https://api.fake-rest.refine.dev";
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
 
 export const appDataProvider = {
-  getOne: async ({ resource, id, meta }) => {
-    const response = await fetch(`${API_URL}/${resource}/${id}`);
+  getOne: async ({ resource, id }) => {
+    const url = `/${resource}/${id}`;
+    const response = await HttpClient.get(url);
 
-    if (response.status < 200 || response.status > 299) throw response;
-
-    const data = await response.json();
-
-    return { data };
+    return { data: response.data.data };
   },
-  update: async ({ resource, id, variables }) => {
-    const response = await fetch(`${API_URL}/${resource}/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify(variables),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
 
-    if (response.status < 200 || response.status > 299) throw response;
-
-    const data = await response.json();
-
-    return { data };
-  },
   getList: async ({ resource, pagination, filters, sorters, meta }) => {
-    const response = await fetch(`${API_URL}/${resource}`);
+    const url = `/${resource}`;
+    const response = await HttpClient.get(url);
+    return { data: response.data.data };
+  },
 
-    if (response.status < 200 || response.status > 299) throw response;
+  create: async (params: { resource: string; variables: {}; meta?: any }) => {
+    const { resource, variables } = params;
+    const url = `/${resource}`;
+    const response = await HttpClient.post(url, variables);
+    return { data: response.data.data };
+  },
 
-    const data = await response.json();
-
-    return {
-      data,
-      total: 0, // We'll cover this in the next steps.
-    };
+  update: async (params: { resource: string; id: BaseKey; variables: {} }) => {
+    const { resource, id, variables } = params;
+    const response = await HttpClient.patch(`/${resource}/${id}`, variables);
+    return { data: response.data.data };
   },
 } as DataProvider;
