@@ -1,8 +1,10 @@
+import { signInWithCredentials, signInWithGoogle } from "@actions/login";
 import { type AuthProvider } from "@refinedev/core";
-import { LoginMethod, type loginOptions } from "@types";
-import { SessionContextValue, signIn, signOut } from "next-auth/react";
+import { DEFAULT_LOGIN_REDIRECT_PATH } from "@routes";
+import { Provider, type loginOptions } from "@types";
+import { AuthError } from "next-auth";
+import { SessionContextValue, signOut, signIn } from "next-auth/react";
 import { usePathname } from "next/navigation";
-
 type Props = Pick<SessionContextValue, "data" | "status">;
 
 export const useAuthProvider = (props: Props) => {
@@ -10,47 +12,35 @@ export const useAuthProvider = (props: Props) => {
   const to = usePathname();
 
   const authProvider: AuthProvider = {
-    login: async ({ email, password, loginMethod }: loginOptions) => {
-      if (loginMethod === LoginMethod.Google) {
-        const result = await signIn("google", {
-          callbackUrl: to ? to.toString() : "/",
-          redirect: true,
-        });
-        if (result?.error) {
-          return {
-            success: false,
-            error: {
-              message: "Login failed",
-              name: "Invalid login",
-            },
-          };
-        }
-      } else {
-        const result = await signIn("credentials", {
-          redirect: false,
-          email,
-          password,
-        });
-        if (result?.error) {
-          return {
-            success: false,
-            error: {
-              message: "Login failed",
-              name: "Invalid email or password",
-            },
-          };
-        }
-      }
+    login: async ({ email, password, providerName }: loginOptions) => {
+      // let response;
+      // if (providerName === Provider.Credentials) {
+      //   response = await signInWithCredentials(email, password);
+      // } else {
+      //   response = await signInWithGoogle();
+      // }
+
+      // console.log({ response });
+      // if (response?.ok) {
+      //   console.log("login success");
+      //   return {
+      //     success: true,
+      //     // redirectTo: DEFAULT_LOGIN_REDIRECT_PATH,
+      //   };
+      // }
 
       return {
-        success: true,
-        redirectTo: "/",
+        success: false,
+        error: {
+          name: "Login Error",
+          message: "response?.error" || "An error occurred during login",
+        },
       };
     },
     logout: async () => {
       signOut({
         redirect: true,
-        callbackUrl: "/login",
+        callbackUrl: "/auth/login",
       });
 
       return {
