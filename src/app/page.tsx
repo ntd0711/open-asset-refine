@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
+import { Layout as BaseLayout } from "@components/layout";
 
 import { Authenticated } from "@refinedev/core";
 import { NavigateToResource } from "@refinedev/nextjs-router";
@@ -10,7 +11,10 @@ export default function IndexPage() {
     <Suspense>
       <Authenticated key="home-page">
         <NavigateToResource />
-        <div>home page</div>
+        <BaseLayout>
+          <div>Home page</div>
+        </BaseLayout>
+        ;
       </Authenticated>
     </Suspense>
   );
