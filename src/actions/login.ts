@@ -39,7 +39,8 @@ export async function signInWithCredentials(
       if ((error.type = "CredentialsSignin")) {
         return { ok: false, error: "Invalid credentials" };
       }
+      return { ok: false, error: "An unexpected error occurred" };
     }
-    return { ok: false, error: "An unexpected error occurred" };
+    throw error;
   }
 }

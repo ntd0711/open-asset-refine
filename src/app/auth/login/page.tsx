@@ -7,14 +7,8 @@ import { useTransition } from "react";
 
 export default function Login() {
   const { mutate: login } = useLogin<loginOptions>();
-  const [isPending, startTransition] = useTransition();
 
-  const handleSignInWithCredentials = async () => {
-    const response = await signInWithCredentials(
-      "nguyendat@gmaul.com",
-      "ahihih"
-    );
-  };
+  const handleSignInWithCredentials = async () => {};
 
   return (
     <div
@@ -28,14 +22,23 @@ export default function Login() {
     >
       <button
         onClick={() => {
-          signInWithGoogle();
-          login({ providerName: Provider.Google });
+          login({ providerName: "google" });
         }}
       >
         Sign in Google
       </button>
 
-      <button onClick={handleSignInWithCredentials}>Sign in Credentials</button>
+      <button
+        onClick={() => {
+          login({
+            providerName: "credentials",
+            email: "nguyendat@gmaul.com",
+            password: "ahihih",
+          });
+        }}
+      >
+        Sign in Credentials
+      </button>
     </div>
   );
 }

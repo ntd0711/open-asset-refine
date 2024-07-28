@@ -1,7 +1,8 @@
-export enum Provider {
-  Google = "google",
-  Credentials = "credentials",
-}
+// export enum Provider {
+//   Google = "google",
+//   Credentials = "credentials",
+// }
+export type Provider = "google" | "credentials";
 
 export type loginOptions =
   | {

@@ -13,29 +13,36 @@ export const useAuthProvider = (props: Props) => {
 
   const authProvider: AuthProvider = {
     login: async ({ email, password, providerName }: loginOptions) => {
-      // let response;
-      // if (providerName === Provider.Credentials) {
-      //   response = await signInWithCredentials(email, password);
-      // } else {
-      //   response = await signInWithGoogle();
-      // }
+      let response;
+      try {
+        if (providerName === "credentials") {
+          response = await signIn("credentials", {
+            email,
+            password,
+            redirect: false,
+          });
+        } else {
+          response = await signIn("google", { redirect: false });
+        }
+        console.log({ responseInAuthProvider: response });
+        if (response?.ok) {
+          console.log("login success");
+          return {
+            success: true,
+            redirectTo: DEFAULT_LOGIN_REDIRECT_PATH,
+          };
+        }
 
-      // console.log({ response });
-      // if (response?.ok) {
-      //   console.log("login success");
-      //   return {
-      //     success: true,
-      //     // redirectTo: DEFAULT_LOGIN_REDIRECT_PATH,
-      //   };
-      // }
-
-      return {
-        success: false,
-        error: {
-          name: "Login Error",
-          message: "response?.error" || "An error occurred during login",
-        },
-      };
+        return {
+          success: false,
+          error: {
+            name: "Login Error",
+            message: "response?.error" || "An error occurred during login",
+          },
+        };
+      } catch (error) {
+        console.log("errorrrr>>>>", error);
+      }
     },
     logout: async () => {
       signOut({

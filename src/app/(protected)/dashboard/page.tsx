@@ -1,12 +1,15 @@
-"use client";
+// "use client";
 import { auth } from "@auth";
 import { useSession } from "next-auth/react";
 
-export default function IndexPage() {
-  // const session = await auth();
-  const session = useSession();
+export default async function IndexPage() {
+  // const session = useSession();
+  const session = await auth();
 
-  console.log(session);
-
-  return <div>Home page</div>;
+  return (
+    <div>
+      <span>dashboard page</span>
+      {JSON.stringify(session)}
+    </div>
+  );
 }
