@@ -1,5 +1,7 @@
 import { HttpError } from "@refinedev/core";
-import axios, { AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import axios, { AxiosResponse } from "axios";
+import { Session } from "next-auth";
+import { getSession } from "next-auth/react";
 
 export interface Response<T = any> {
   data: T;
@@ -8,19 +10,26 @@ export interface Response<T = any> {
 }
 
 const axiosInstance = axios.create({
-  // baseURL: process.env.NEXT_PUBLIC_API_URL,
-  baseURL: "https://api.fake-rest.refine.dev",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  // baseURL: "https://api.fake-rest.refine.dev",
   timeout: 60 * 1000,
 });
 
+let lastSession: Session | null = null;
+
 axiosInstance.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem("auth_token");
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+  async (config) => {
+    const isLastSessionExpired =
+      lastSession == null || Date.now() > Date.parse(lastSession.expires);
+    if (isLastSessionExpired) {
+      const session = await getSession();
+      lastSession = session;
+    }
+
+    if (lastSession) {
+      config.headers["Authorization"] = `Bearer ${lastSession.access_token}`;
+    } else {
+      config.headers["Authorization"] = undefined;
     }
     return config;
   },
