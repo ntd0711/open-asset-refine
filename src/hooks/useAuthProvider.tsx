@@ -1,5 +1,5 @@
 import { signInWithCredentials, signInWithGoogle } from "@actions/login";
-import { type AuthProvider } from "@refinedev/core";
+import { AuthActionResponse, type AuthProvider } from "@refinedev/core";
 import { DEFAULT_LOGIN_REDIRECT_PATH } from "@routes";
 import { Provider, type loginOptions } from "@types";
 import { AuthError } from "next-auth";
@@ -12,7 +12,11 @@ export const useAuthProvider = (props: Props) => {
   const to = usePathname();
 
   const authProvider: AuthProvider = {
-    login: async ({ email, password, providerName }: loginOptions) => {
+    login: async ({
+      email,
+      password,
+      providerName,
+    }: loginOptions): Promise<AuthActionResponse> => {
       let response;
       try {
         if (providerName === "credentials") {
@@ -24,7 +28,7 @@ export const useAuthProvider = (props: Props) => {
         } else {
           response = await signIn("google", { redirect: false });
         }
-        console.log({ responseInAuthProvider: response });
+
         if (response?.ok) {
           console.log("login success");
           return {
@@ -32,16 +36,14 @@ export const useAuthProvider = (props: Props) => {
             redirectTo: DEFAULT_LOGIN_REDIRECT_PATH,
           };
         }
-
         return {
           success: false,
-          error: {
-            name: "Login Error",
-            message: "response?.error" || "An error occurred during login",
-          },
         };
       } catch (error) {
         console.log("errorrrr>>>>", error);
+        return {
+          success: false,
+        };
       }
     },
     logout: async () => {
@@ -66,7 +68,6 @@ export const useAuthProvider = (props: Props) => {
       };
     },
     check: async (context) => {
-      console.log({ context });
       if (status === "unauthenticated") {
         return {
           authenticated: false,

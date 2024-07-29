@@ -30,6 +30,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         //   }
         //   if (response.status == 200) {
         //     const user = response.data.data;
+        //     user.serverAccessToken = response.data.data.serverAccessToken;
         //     return user;
         //   }
         // } catch (error) {
@@ -37,19 +38,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         //   return null;
         // }
         // return null;
-
         // ------------------------------------------------------------
-
         // return null;
-        console.log({ credentials });
-        console.log("sign in with email, password");
+        // console.log({ credentials });
+        // console.log("sign in with email, password");
         const user: User = {
           id: "1",
           name: "John Doe",
           email: "demo@refine.dev",
           image: "https://i.pravatar.cc/300",
         };
-
+        user.serverAccessToken = "myServerAccessToken";
         return user;
       },
     }),
@@ -57,45 +56,55 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
       // console.log({ user, account, profile, email, credentials });
-      console.log("sign innn");
+      // console.log("sign innn");
       // if (account?.provider === "google") {
       //   try {
       //     console.log("sign in with google");
       //     // call api backend register user
-      //     const backendToken = `backend-token-${user.email}`;
-      //     cookies().set("backendToken", backendToken, {
-      //       httpOnly: true,
-      //       secure: process.env.NODE_ENV === "production",
-      //       sameSite: "strict",
-      //       maxAge: 30 * 24 * 60 * 60, // 30 days
-      //     });
-
-      //     return true;
+      //          const response = await HttpClient.post<User>(
+      //       "http://api-signin-google-url.com/",
+      //       user
+      //     );
+      //     if (response.data.status === 401) {
+      //       return false;
+      //     }
+      //     if (response.status == 200) {
+      //       const user = response.data.data;
+      //       user.accessToken = response.data.data.accessToken
+      //       return true;
+      //     }
       //   } catch (error) {
       //     console.error("Error registering Google user:", error);
       //     return false;
       //   }
       // }
-      user.token = 123123131;
-      return true; // allow sign in
+      // return false; // allow sign in
+      // ---------------------------------------------------------------------------------
+      user.serverAccessToken = "myServerAccessToken";
+      return true;
     },
     async jwt({ token, user, account, profile, session }) {
-      if (!user || !account) {
-        throw new Error("No user or account found");
+      // console.log("jwtTTT", { token, user, account, profile, session });
+      // if (!user && !account) {
+      //   throw new Error("No user or account found");
+      // }
+      if (
+        account?.provider &&
+        ["google", "credentials"].includes(account.provider)
+      ) {
+        token.access_token = user.serverAccessToken;
       }
-      token.accessToken = user.accessToken;
-      console.log("jwtTTT", { token, user, account, profile, session });
-      // console.log({ token });
       return token;
     },
     async session({ session, token }) {
-      // throw new Error("No token found");
-      // console.log({ session, token });
-      // if (!token) {
-      //   console.log("no token");
-      // }
+      // console.log("session>>>>>>>>>>>", { session, token });
+      // session.accessToken = token.accessToken;
+      // session.serverAccessToken = token.serverAccessToken;
       if (token.sub) {
         session.user.id = token.sub;
+      }
+      if (token.access_token) {
+        session.access_token = token.access_token;
       }
       return session;
     },
