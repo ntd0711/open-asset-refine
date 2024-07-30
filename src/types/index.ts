@@ -15,3 +15,20 @@ export type loginOptions =
       email?: string;
       password?: string;
     };
+
+export enum Role {
+  Admin = "admin",
+  User = "user",
+}
+
+// export enum RoleType {
+//   Admin = 1,
+//   User = 2,
+// }
+
+export type UserResponse = {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+};
