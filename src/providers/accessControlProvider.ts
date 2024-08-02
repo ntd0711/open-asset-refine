@@ -12,8 +12,8 @@ export const accessControlProvider: AccessControlProvider = {
       action === "list" || action === "show" ? Action.Read : action;
 
     return {
-      can: ability.can(caslAction, resource);
+      can: ability.can(caslAction, resource),
       reason: "Unauthorized",
-    }
+    };
   },
 };

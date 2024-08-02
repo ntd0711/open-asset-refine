@@ -30,7 +30,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         //   }
         //   if (response.status == 200) {
         //     const user = response.data.data;
-        //     user.serverAccessToken = response.data.data.serverAccessToken;
+        // const token = response.data.data.token;
+        // const decodedToken = jwt.decode(token);
+        // if (!decodedToken || typeof decodedToken === "string") {
+        //   return null;
+        // }
+        // cookies().set({
+        //   name: "access_token",
+        //   value: token,
+        //   httpOnly: true,
+        //   sameSite: "lax",
+        //   maxAge: ((decodedToken.exp ?? 0) - (decodedToken.iat ?? 0)) * 1000,
+        //   domain: process.env.COOKIE_DOMAIN || undefined,
+        // });
         //     return user;
         //   }
         // } catch (error) {
@@ -42,14 +54,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // return null;
         // console.log({ credentials });
         // console.log("sign in with email, password");
+
         const user: User = {
           id: "1",
           name: "John Doe",
           email: "demo@refine.dev",
           image: "https://i.pravatar.cc/300",
           role: "user",
+          access_token: "myServerAccessToken",
         };
-        user.serverAccessToken = "myServerAccessToken";
+
+        cookies().set({
+          name: "access_token",
+          value: "myServerAccessToken",
+          httpOnly: true,
+          maxAge: 2 * 24 * 60 * 60,
+          sameSite: "lax",
+        });
+
         return user;
       },
     }),
@@ -81,40 +103,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // }
       // return false; // allow sign in
       // ---------------------------------------------------------------------------------
-      user.serverAccessToken = "myServerAccessToken";
+      // user.access_token = "myServerAccessToken";
       return true;
     },
     async jwt({ token, user, account, profile, session }) {
       // console.log("jwtTTT", { token, user, account, profile, session });
-      // if (!user && !account) {
-      //   throw new Error("No user or account found");
-      // }
-      if (
-        account?.provider &&
-        ["google", "credentials"].includes(account.provider)
-      ) {
-        token.access_token = user.serverAccessToken;
-        token.role = user.role;
-      }
-      return token;
+      return { ...token, ...user };
     },
     async session({ session, token }) {
       // console.log("session>>>>>>>>>>>", { session, token });
-      // session.accessToken = token.accessToken;
+      // session.accessToken = token.a accessToken;
       // session.serverAccessToken = token.serverAccessToken;
-      if (token.role) {
-        session.user.role = token.role;
-      }
-      if (token.sub) {
+      // if (token.role && session.user) {
+      //   session.user.role = token.role;
+      // }
+      if (token.sub && session.user) {
         session.user.id = token.sub;
       }
       if (token.access_token) {
         session.access_token = token.access_token;
       }
+      if (token.role) {
+        session.user.role = token.role;
+      }
       return session;
     },
   },
   pages: {
-    signIn: "auth/login",
+    signIn: "auth",
   },
 });

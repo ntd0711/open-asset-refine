@@ -4,7 +4,7 @@ export default async function PublicPage() {
   const session = await auth();
   return (
     <Suspense>
-      <div>public page</div>
+      <div>Home page</div>
       {JSON.stringify(session)}
     </Suspense>
   );

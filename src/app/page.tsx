@@ -14,7 +14,6 @@ export default function IndexPage() {
         <BaseLayout>
           <div>Home page</div>
         </BaseLayout>
-        ;
       </Authenticated>
     </Suspense>
   );
