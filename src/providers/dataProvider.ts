@@ -7,6 +7,7 @@ export const appDataProvider = (): DataProvider =>
       const url = `${resource}/${id}`;
       const response = await HttpClient.get(url);
       return { data: response.data };
+      // return { data: response.data.data };
     },
 
     getList: async ({ resource, pagination, filters, sorters, meta }) => {

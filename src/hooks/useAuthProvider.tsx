@@ -1,23 +1,21 @@
-import { signInWithCredentials, signInWithGoogle } from "@actions/login";
+import { logout } from "@actions/logout";
 import { AuthActionResponse, type AuthProvider } from "@refinedev/core";
 import { DEFAULT_LOGIN_REDIRECT_PATH } from "@routes";
-import { Provider, type loginOptions } from "@types";
-import { AuthError } from "next-auth";
-import { SessionContextValue, signOut, signIn } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { type LoginOptions } from "@types";
+import { SessionContextValue, signIn } from "next-auth/react";
+
 type Props = Pick<SessionContextValue, "data" | "status">;
 
 export const useAuthProvider = (props: Props) => {
   const { data, status } = props;
-  const to = usePathname();
 
   const authProvider: AuthProvider = {
     login: async ({
       email,
       password,
       providerName,
-    }: loginOptions): Promise<AuthActionResponse> => {
-      let response;
+    }: LoginOptions): Promise<AuthActionResponse> => {
+      let response = undefined;
       try {
         if (providerName === "credentials") {
           response = await signIn("credentials", {
@@ -30,57 +28,57 @@ export const useAuthProvider = (props: Props) => {
         }
 
         if (response?.ok) {
-          console.log("login success");
           return {
             success: true,
-            redirectTo: DEFAULT_LOGIN_REDIRECT_PATH,
+            // redirectTo: DEFAULT_LOGIN_REDIRECT_PATH,
           };
         }
         return {
           success: false,
         };
       } catch (error) {
-        console.log("errorrrr>>>>", error);
+        console.log(error);
         return {
           success: false,
         };
       }
     },
     logout: async () => {
-      signOut({
-        redirect: true,
-        callbackUrl: "/auth/login",
-      });
-
-      return {
-        success: true,
-      };
-    },
-    onError: async (error) => {
-      if (error.response?.status === 401) {
+      try {
+        // using server action that supports destroy cookie
+        await logout();
         return {
-          logout: true,
+          success: true,
+        };
+      } catch (error) {
+        return {
+          success: false,
         };
       }
-
-      return {
-        error,
-      };
     },
-    check: async (context) => {
+    onError: async (error) => {
+      if (error.status === 401 || error.status === 403) {
+        return {
+          logout: true,
+          redirectTo: "auth/login",
+          error,
+        };
+      }
+      return {};
+    },
+    check: async () => {
       if (status === "unauthenticated") {
         return {
           authenticated: false,
           redirectTo: "/login",
         };
       }
-
       return {
         authenticated: true,
       };
     },
-    getPermissions: async () => {
-      return null;
+    getPermissions: async (params) => {
+      return ["admin"];
     },
     getIdentity: async () => {
       if (data?.user) {

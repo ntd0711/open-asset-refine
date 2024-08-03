@@ -22,6 +22,9 @@ export const Menu = () => {
         ))}
       </ul>
       <button onClick={() => logout()}>Logout</button>
+      <div>
+        <Link href="/">Home</Link>|<Link href="/dashboard">Dashboard</Link>
+      </div>
     </nav>
   );
 };
