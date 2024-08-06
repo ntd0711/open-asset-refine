@@ -18,7 +18,6 @@ import {
   FormMessage,
 } from "@components/ui/form";
 import React, { FC } from "react";
-import { GoogleUserSignUp } from "./GoogleUserSignUpModal";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@components/ui/input";
 import { Button } from "@components/ui/button";
@@ -29,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/ui/select";
+import { type CredentialUserSignUp } from "./CredentialUserSignUpModal";
 
 type Props = {
   onSubmit: () => void;
@@ -40,7 +40,13 @@ export const UserIdForm: FC<Props> = (props) => {
     watch,
     control,
     formState: { errors },
-  } = useFormContext<GoogleUserSignUp>();
+    trigger,
+  } = useFormContext<CredentialUserSignUp>();
+  const handleSubmit = async () => {
+    const isValid = await trigger("userId");
+    if (!isValid) return;
+    props.onSubmit();
+  };
   return (
     <CredenzaContent>
       <CredenzaHeader>
@@ -49,7 +55,7 @@ export const UserIdForm: FC<Props> = (props) => {
         </CredenzaTitle>
         <CredenzaDescription className="text-left text-[#212121] text-[12px] leading-[21px]">
           Open
-          Threadsで使われるアドレスです。英数字のみ使用できます。すでに使われているものは設定できません。後から変更することもできます。
+          Threadsで使われるIDです。英数字のみ使用できます。すでに使われているものは設定できません。後から変更することもできます。
         </CredenzaDescription>
       </CredenzaHeader>
       <CredenzaBody>
@@ -58,9 +64,9 @@ export const UserIdForm: FC<Props> = (props) => {
           name="userId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>ユーザー名</FormLabel>
+              <FormLabel>ユーザーIDの入力</FormLabel>
               <FormControl>
-                <Input placeholder="＠テキスト" {...field} />
+                <Input placeholder="" {...field} />
               </FormControl>
               <FormDescription></FormDescription>
               <FormMessage />
@@ -70,8 +76,9 @@ export const UserIdForm: FC<Props> = (props) => {
       </CredenzaBody>
       <CredenzaFooter>
         <Button
+          type="submit"
           className="bg-[#1976D2] hover:bg-[#1976D2]"
-          onClick={props.onSubmit}
+          onClick={handleSubmit}
         >
           次へ
         </Button>

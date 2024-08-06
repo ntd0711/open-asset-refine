@@ -18,7 +18,6 @@ import {
   FormMessage,
 } from "@components/ui/form";
 import React, { FC } from "react";
-import { GoogleUserSignUp } from "./GoogleUserSignUpModal";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@components/ui/input";
 import { Button } from "@components/ui/button";
@@ -29,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@components/ui/select";
+import { CredentialUserSignUp } from "./CredentialUserSignUpModal";
 
 type Props = {
   onNext: () => void;
@@ -38,26 +38,32 @@ const years = Array.from({ length: 100 }, (_, i) => 2024 - i);
 const months = Array.from({ length: 12 }, (_, i) => i + 1);
 const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
-export const DateOfBirthForm: FC<Props> = (props) => {
+export const NameAndDateOfBirth: FC<Props> = (props) => {
   const {
     getValues,
     watch,
     control,
     trigger,
     formState: { errors },
-  } = useFormContext<GoogleUserSignUp>();
+  } = useFormContext<CredentialUserSignUp>();
 
   const handleSubmit = async () => {
     const isValid = await trigger([
       "birthday.year",
       "birthday.month",
       "birthday.day",
+      "nickname",
     ]);
     console.log({ isValid });
     if (!isValid) {
       console.error("invalid");
       return;
     }
+    // console.log({
+    //   year: getValues("birthday.year"),
+    //   month: getValues("birthday.month"),
+    //   day: getValues("birthday.day"),
+    // });
     props.onNext();
     // console.log(errors);
   };
@@ -73,6 +79,21 @@ export const DateOfBirthForm: FC<Props> = (props) => {
         </CredenzaDescription>
       </CredenzaHeader>
       <CredenzaBody>
+        <FormField
+          control={control}
+          name="nickname"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>名前（ニックネーム）</FormLabel>
+              <FormControl>
+                <Input placeholder="山田　花子" {...field} />
+              </FormControl>
+              <FormDescription></FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={control}
           name="birthday.year"

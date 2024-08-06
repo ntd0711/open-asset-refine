@@ -16,7 +16,7 @@ export const useGoogleSignUpButton = (
         document.getElementById("g_id_onload");
       window.google.accounts.id.renderButton(googleLoginDiv, {
         size: "large",
-        width: "320px",
+        width: "320",
         locale: "ja",
         logo_alignment: "left",
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,

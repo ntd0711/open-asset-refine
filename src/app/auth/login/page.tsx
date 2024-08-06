@@ -1,35 +1,47 @@
 "use client";
+
 import { signInWithCredentials, signInWithGoogle } from "@actions/login";
-import { Button } from "@components/ui/button";
 import { useLogin } from "@refinedev/core";
-import { LoginOptions } from "@types";
-import { signIn } from "next-auth/react";
+import { Provider } from "@types";
+import { useTransition } from "react";
+
+export default function Login() {
+  const { mutate: login } = useLogin<any>();
+
+  const handleSignInWithCredentials = async () => {};
 
 export default function Login() {
   const { mutate: login, error, data } = useLogin<LoginOptions>();
   console.log({ error, data });
   return (
-    <div className="py-[34px] px-[20px] sm:p-0 sm:flex sm:h-[100%]">
-      Login page
-      <Button
-        onClick={async () => {
-          try {
-            await signInWithGoogle();
-          } catch (error) {
-            console.log(error);
-          }
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+      }}
+    >
+      <button
+        onClick={() => {
+          login({ providerName: "google" });
         }}
       >
-        Google Login
-      </Button>
-      <Button
-        onClick={async () => {
-          const result = await signInWithCredentials("ahihi", "ahihi");
-          console.log({ result });
+        Sign in Google
+      </button>
+
+      <button
+        onClick={() => {
+          login({
+            providerName: "credentials",
+            email: "nguyendat@gmaul.com",
+            password: "ahihih",
+          });
         }}
       >
-        Credential Login
-      </Button>
+        Sign in Credentials
+      </button>
     </div>
   );
 }
