@@ -67,3 +67,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+.g_id_signin {
+  display: flex;
+  justify-content: center;
+}

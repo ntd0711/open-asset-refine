@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import ButtonActionsGroup from "./ButtonActionsGroup";
 import { useSession } from "next-auth/react";
 import { useGoogleSignUpButton } from "@hooks/auth/google/useGoogleSignUpButton";
 import { Button } from "@components/ui/button";
@@ -9,6 +8,8 @@ import { GoogleSignUpButton } from "./button/GoogleSignupButton";
 import * as jwt from "jsonwebtoken";
 import { useForm } from "@refinedev/react-hook-form";
 import { GoogleUserSignUpModal } from "./google/GoogleUserSignUpModal";
+import CredentialUserSignUpModal from "./credential/CredentialUserSignUpModal";
+import { LoginModal } from "./login/LoginModal";
 
 type Props = {};
 
@@ -24,7 +25,10 @@ const RightSide = (props: Props) => {
   const [credentialUserSignUpModalOpen, setCredentialUserSignUpModalOpen] =
     useState(false);
 
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+
   function handleCredentialResponse(response: { credential: string }) {
+    console.log({ response });
     setCredentialGoogle(response.credential);
     setGoogleUserSignUpModalOpen(true);
   }
@@ -46,8 +50,8 @@ const RightSide = (props: Props) => {
             <GoogleSignUpButton />
             <div className="bg-[#212121] w-[100%] h-[0.33px]"></div>
             <Button
-              className="bg-[#1976D2] text-[#FFFFFF] text-[15px] leading-[21px] w-[100%] max-w-[320px] mx-auto py-[14px] h-auto hover:bg-[#1976D2]"
-              onClick={() => {}}
+              className="text-[#FFFFFF] text-[15px] leading-[21px] w-[100%] max-w-[320px] mx-auto py-[14px] h-auto bg-[#1976D2] hover:bg-[#1976D2]"
+              onClick={() => setCredentialUserSignUpModalOpen(true)}
             >
               メールアドレスで登録
             </Button>
@@ -61,18 +65,25 @@ const RightSide = (props: Props) => {
             </p>
             <Button
               className="text-[#212121] bg-[#FFFFFF] text-[15px] leading-[21px] w-[100%] max-w-[320px] mx-auto py-[14px] h-auto hover:bg-white"
-              onClick={() => {}}
+              onClick={() => setLoginModalOpen(true)}
             >
               ログイン
             </Button>
           </div>
         </div>
       </div>
-      <GoogleUserSignUpModal
-        credential={credentialGoogle}
-        open={googleUserSignUpModalOpen}
-        onOpenChange={setGoogleUserSignUpModalOpen}
+      {credentialGoogle && (
+        <GoogleUserSignUpModal
+          credential={credentialGoogle}
+          open={googleUserSignUpModalOpen}
+          onOpenChange={setGoogleUserSignUpModalOpen}
+        />
+      )}
+      <CredentialUserSignUpModal
+        open={credentialUserSignUpModalOpen}
+        onOpenChange={setCredentialUserSignUpModalOpen}
       />
+      <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
     </>
   );
 };

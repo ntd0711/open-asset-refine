@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Credenza,
   CredenzaBody,
@@ -9,6 +10,8 @@ import {
   CredenzaTitle,
   CredenzaTrigger,
 } from "@components/auth/Credenza";
+import { useFormContext } from "react-hook-form";
+import { CredentialUserSignUp } from "./CredentialUserSignUpModal";
 import {
   FormControl,
   FormDescription,
@@ -17,45 +20,43 @@ import {
   FormLabel,
   FormMessage,
 } from "@components/ui/form";
-import React, { FC } from "react";
-import { GoogleUserSignUp } from "./GoogleUserSignUpModal";
-import { useFormContext } from "react-hook-form";
 import { Input } from "@components/ui/input";
 import { Button } from "@components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@components/ui/select";
 
 type Props = {
-  onSubmit: () => void;
+  onNext: () => void;
 };
 
-export const UserIdForm: FC<Props> = (props) => {
+export const EmailVerify = (props: Props) => {
   const {
     getValues,
     watch,
     control,
     formState: { errors },
-  } = useFormContext<GoogleUserSignUp>();
+    trigger,
+  } = useFormContext<CredentialUserSignUp>();
+  const handleSubmit = async () => {
+    const isValid = await trigger("verificationCode");
+    console.log({ isValid });
+    if (!isValid) return;
+    props.onNext();
+  };
   return (
     <CredenzaContent>
       <CredenzaHeader>
         <CredenzaTitle className="text-left text-[#212121] text-[20px] font-[600]">
-          ユーザーIDを新しく作成
+          メールアドレスを認証して下さい
         </CredenzaTitle>
         <CredenzaDescription className="text-left text-[#212121] text-[12px] leading-[21px]">
-          Open
-          Threadsで使われるアドレスです。英数字のみ使用できます。すでに使われているものは設定できません。後から変更することもできます。
+          メールを送信しました。
+          〇〇〇〇〇〇〇〇@gmail.comメールに届いたリンクの認証コードを入力してOpen
+          Threadsをはじめましょう！
         </CredenzaDescription>
       </CredenzaHeader>
       <CredenzaBody>
         <FormField
           control={control}
-          name="userId"
+          name="verificationCode"
           render={({ field }) => (
             <FormItem>
               <FormLabel>ユーザー名</FormLabel>
@@ -71,13 +72,13 @@ export const UserIdForm: FC<Props> = (props) => {
       <CredenzaFooter>
         <Button
           className="bg-[#1976D2] hover:bg-[#1976D2]"
-          onClick={props.onSubmit}
+          onClick={handleSubmit}
         >
-          次へ
+          TOPへ戻る
         </Button>
-        <CredenzaClose asChild>
+        {/* <CredenzaClose asChild>
           <Button variant="link">閉じる</Button>
-        </CredenzaClose>
+        </CredenzaClose> */}
       </CredenzaFooter>
     </CredenzaContent>
   );

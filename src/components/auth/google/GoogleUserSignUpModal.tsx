@@ -1,15 +1,5 @@
-import React, { useState } from "react";
-import {
-  Credenza,
-  CredenzaBody,
-  CredenzaClose,
-  CredenzaContent,
-  CredenzaDescription,
-  CredenzaFooter,
-  CredenzaHeader,
-  CredenzaTitle,
-  CredenzaTrigger,
-} from "@/components/ui/credenza";
+import React, { useEffect, useMemo, useState } from "react";
+import { Credenza } from "@components/auth/Credenza";
 import { z } from "zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,38 +32,46 @@ export const GoogleUserSignUpModal = (props: Props) => {
       userId: "",
     },
     resolver: zodResolver(GoogleUserSignUpSchema),
+    mode: "onChange",
+    reValidateMode: "onChange",
   });
-
-  const handleOpenChange = (isOpen: boolean) => {
-    onOpenChange(isOpen);
-    setStep(1);
-    method.clearErrors();
-    method.reset();
-  };
 
   function handleNext() {
     setStep((prev) => prev + 1);
   }
 
-  const steps = [
-    {
-      title: "dateOfBirth",
-      content: <DateOfBirthForm onNext={handleNext} />,
-    },
-    {
-      title: "userId",
-      content: <UserIdForm onSubmit={method.handleSubmit(onSubmit)} />,
-    },
-  ];
+  const steps = useMemo(
+    () => [
+      {
+        title: "dateOfBirth",
+        content: <DateOfBirthForm onNext={handleNext} />,
+      },
+      {
+        title: "userId",
+        content: <UserIdForm onSubmit={method.handleSubmit(onSubmit)} />,
+      },
+    ],
+    []
+  );
 
-  console.log("error:::", method.formState.errors);
+  useEffect(() => {
+    if (open === true) {
+      setStep(1);
+      method.clearErrors();
+      method.reset();
+    }
+  }, [open]);
+
+  const handleOpenChange = (isOpen: boolean) => {
+    onOpenChange(isOpen);
+  };
 
   function onSubmit(values: GoogleUserSignUp) {
     if (!credential) return;
     const payload = { ...values, credential };
     console.log(payload);
   }
-
+  // console.log(is);
   return (
     <Credenza open={open} onOpenChange={handleOpenChange}>
       <Form {...method}>

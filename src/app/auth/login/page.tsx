@@ -1,9 +1,44 @@
+"use client";
+
+import { signInWithCredentials, signInWithGoogle } from "@actions/login";
+import { useLogin } from "@refinedev/core";
+import { Provider } from "@types";
+import { useTransition } from "react";
+
 export default function Login() {
-  // const handleSignInWithCredentials = async () => {};
+  const { mutate: login } = useLogin<any>();
+
+  const handleSignInWithCredentials = async () => {};
 
   return (
-    <div className="py-[34px] px-[20px] sm:p-0 sm:flex sm:h-[100%]">
-      Login page
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+      }}
+    >
+      <button
+        onClick={() => {
+          login({ providerName: "google" });
+        }}
+      >
+        Sign in Google
+      </button>
+
+      <button
+        onClick={() => {
+          login({
+            providerName: "credentials",
+            email: "nguyendat@gmaul.com",
+            password: "ahihih",
+          });
+        }}
+      >
+        Sign in Credentials
+      </button>
     </div>
   );
 }
