@@ -10,6 +10,9 @@ export default function Login() {
 
   const handleSignInWithCredentials = async () => {};
 
+export default function Login() {
+  const { mutate: login, error, data } = useLogin<LoginOptions>();
+  console.log({ error, data });
   return (
     <div
       style={{

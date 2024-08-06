@@ -18,28 +18,23 @@ export async function signInWithGoogle() {
   }
 }
 
-export async function signInWithCredentials(
-  email: string,
-  password: string
-): Promise<SignInResponse> {
+export async function signInWithCredentials(email: string, password: string) {
   try {
-    const result = await signIn("credentials", {
+    await signIn("credentials", {
       email,
       password,
+      redirect: true,
       redirectTo: DEFAULT_LOGIN_REDIRECT_PATH,
     });
-    if (result) {
-      return {
-        ok: true,
-      };
-    }
-    return result;
   } catch (error) {
     if (error instanceof AuthError) {
-      if ((error.type = "CredentialsSignin")) {
-        return { ok: false, error: "Invalid credentials" };
+      switch (error.type) {
+        case "CallbackRouteError": {
+          return { error: error.cause?.err?.message };
+        }
+        default:
+          return { error: "An authentication error occurred" };
       }
-      return { ok: false, error: "An unexpected error occurred" };
     }
     throw error;
   }
